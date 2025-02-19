@@ -4,7 +4,7 @@ from dash.dependencies import Input, Output
 import requests
 
 # Replace with the actual Raspberry Pi IP address
-raspberry_pi_url = 'http://<raspberry_pi_ip>:5000'
+raspberry_pi_url = 'http://192.168.8.103:5000'
 
 # Initialize the Dash app
 app = dash.Dash(__name__)
@@ -18,21 +18,11 @@ app.layout = html.Div([
     dcc.Slider(
         id='pwm_slider',
         min=0,
-        max=255,
+        max=100,
         step=1,
         value=0,
-        marks={i: str(i) for i in range(0, 256, 50)},
-        tooltip={"placement": "bottom", "always_visible": True},
-        style={'margin': '20px'}
-    ),
-
-    # Checkbox for the switch state
-    html.Label("Switch Control:"),
-    dcc.Checklist(
-        id='switch_state',
-        options=[{'label': ' ON', 'value': 'on'}],
-        value=[],  # Default: OFF
-        style={'margin': '20px'}
+        marks={i: str(i) for i in range(0, 101, 50)},
+        tooltip={"placement": "bottom", "always_visible": True}
     ),
 
     # Button to submit values
@@ -47,14 +37,13 @@ app.layout = html.Div([
     Output('output_message', 'children'),
     Input('submit_button', 'n_clicks'),
     Input('pwm_slider', 'value'),
-    Input('switch_state', 'value')
 )
-def send_data(n_clicks, pwm_value, switch_state):
+
+def send_data(n_clicks, pwm_value):
     if n_clicks > 0:
         try:
             response = requests.post(f'{raspberry_pi_url}/control', data={
                 'pwm_value': pwm_value,
-                'switch_state': 'on' if 'on' in switch_state else 'off'
             })
             return "Data sent successfully!" if response.status_code == 200 else "Error sending data."
         except requests.exceptions.RequestException:
@@ -64,4 +53,4 @@ def send_data(n_clicks, pwm_value, switch_state):
 
 # Run the Dash server
 if __name__ == '__main__':
-    app.run_server(debug=True, host='0.0.0.0', port=8050)
+    app.run_server(debug=True, host='0.0.0.0', port=8080)
