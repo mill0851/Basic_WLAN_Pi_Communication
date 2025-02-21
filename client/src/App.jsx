@@ -9,6 +9,7 @@ function App() {
     const [message, setMessage] = useState("");
     const pressedKeys = new Set();
     const validKeys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+    const [driveMode, setDriveMode] = useState("stop");
 
     const sendData = () => {
         socket.emit("send_data", { value: message });
@@ -22,18 +23,22 @@ function App() {
                 let driveState = "";
                 if (e.key === "ArrowUp") {
                     driveState = "forward";
+                    setDriveMode("forward");
                     console.log(driveState);
                 }
                 else if (e.key === "ArrowDown") {
                     driveState = "reverse";
+                    setDriveMode("reverse");
                     console.log(driveState);
                 }
                 else if (e.key === "ArrowLeft") {
                     driveState = "left";
+                    setDriveMode("left");
                     console.log(driveState);
                 }
                 else if (e.key === "ArrowRight") {
                     driveState = "right";
+                    setDriveMode("right");
                     console.log(driveState);
                 }
                 if (driveState) {
@@ -45,9 +50,10 @@ function App() {
         const handleArrowKeyUp = async (e) => {
             if (pressedKeys.has(e.key)) {
                 pressedKeys.delete(e.key);
-                
+
                 if ([...pressedKeys].every(key => !validKeys.includes(key))) {
                     socket.emit('send_data', 'stop');
+                    setDriveMode("stop");
                 }
             }
         }
@@ -63,20 +69,23 @@ function App() {
 
 
     return (
-        <Container>
+        <Container fluid className="bg-dark vh-100 text-light">
             <Row className="justify-content-center">
-                <Col md={6} className="text-center">
-                    <h4>WebSocket Communication Example</h4>
+                <Col md={12} className="text-center">
+                    <h4>Rapberry Pi Control Interface</h4>
                 </Col>
             </Row>
             <Row className="justify-content-center">
-                <Col md={6} className="justify-content-center">
-                    <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} className="form-control" />
+                <Col sm={12} md={8} lg={8} className="d-flex justify-content-center">
+                    <div
+                        className="border border-light p-2"
+                        style={{ width: "750px", height: "600px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    </div>
                 </Col>
             </Row>
-            <Row className="justify-content-center">
-                <Col md={6} className="d-flex justify-content-center">
-                    <Button onClick={sendData} className="mt-3">Send Data</Button>
+            <Row className="justify-content-center mt-3">
+                <Col lg={6} className="text-center">
+                    <h5>Drive Mode: {driveMode}</h5>
                 </Col>
             </Row>
         </Container>
